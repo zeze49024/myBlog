@@ -1,50 +1,70 @@
 # zeze49024 · 个人网站
 
-个人介绍、公开项目展示与博客。计划域名：`zeze49024.com`。
+个人介绍、公开项目展示与博客，以及仅站长可登录的内容管理后台。计划域名：`zeze49024.com`。
 
-## 已确认需求
+前端使用 Vite、JavaScript、Tailwind CSS 4、Lucide 和 Simple Icons，沿用已确认的第一版 UI；后端使用 Node.js、Express 和 SQLite。
 
-- 简体中文、单页滚动，展示昵称 zeze49024、用户提供的头像与所在地山东省济南市，不展示职业。
-- 黑白灰为主，少量彩色强调；默认浅色，支持手动切换深色；丰富且尊重减少动态效果设置的动效。
-- 项目入口直接跳转 GitHub 仓库；整理全部公开仓库，私有仓库不公开披露。
-- 第一期包含博客区。
-- 使用 SVG 社交平台 Logo；接入 B 站主页并预留更多渠道。
-- 根目录 `ui-design/` 保存第一版 Tailwind CSS 交互原型、设计说明与预览截图。
+## 本机运行
 
-## 当前阶段
-
-第一版 Tailwind CSS 交互原型已完成，源码位于 `ui-design/`。先进行 UI 评审，暂不部署服务器或修改 DNS。
-
-用户提供的头像仅用于此个人网站。原型中项目界面与博客示例会明确标注为演示内容。
-
-## 预览
-
-直接用现代浏览器打开 [`ui-design/preview.html`](ui-design/preview.html)，无需安装依赖或联网加载资源。
-
-开发和构建（Node.js 22.12+ 或受 Vite 支持的新版本）：
+要求 Node.js **24.13 或更高版本**。此工作区已初始化站长账号：
 
 ```powershell
 npm ci
-npm run dev
+npm run build
+npm start
 ```
 
-开发地址：<http://127.0.0.1:5173/>。
+- 主页：<http://127.0.0.1:5180/>
+- 后台：<http://127.0.0.1:5180/admin>
+- 账号：`zeze49024`，使用站长指定的密码。密码明文与哈希都不包含在仓库里。
+
+开发模式运行 `npm run dev`，打开 <http://127.0.0.1:5173/> 或 <http://127.0.0.1:5173/admin>。它同时启动 Vite、API 和同源代理。勿与 `npm start` 同时占用 5180 端口。
+
+## 新服务器初始化
+
+克隆仓库不包含本机数据库，必须单独初始化。PowerShell 7 下可使用隐藏输入，避免密码字面量进入命令历史：
 
 ```powershell
-npm run build
-npm run preview
+$sitePassword = Read-Host '站长密码' -MaskInput
+$sitePassword | npm run admin:init
+Remove-Variable sitePassword
 ```
 
-构建结果为 `dist/`，同时重新生成独立预览 `ui-design/preview.html`。正式网站构建不依赖 Tailwind CDN。
+命令只允许固定账号 `zeze49024`。密码用随机盐和 scrypt 哈希存入服务端 `DATA_DIR/site.sqlite`。没有注册入口。重复初始化会拒绝，显式加 `--reset` 可重设并撤销全部会话。
 
-## 文件入口
+生产模式强制 HTTPS、安全 Cookie 和配置的同源来源。Linux/容器操作见 [部署说明](docs/DEPLOYMENT.md)。
 
-- `ui-design/DESIGN.md`：视觉方向、设计规范与交互说明。
-- `ui-design/CONTENT-SOURCES.md`：公开仓库与项目简介依据。
-- `ui-design/QA.md`：实际验证范围与当前限制。
-- `ui-design/previews/`：桌面浅色、桌面深色、手机与博客阅读截图。
-- `ui-design/src/content.js`：项目和博客内容。
-- `ui-design/src/main.js`：页面和交互。
-- `ui-design/src/style.css`：Tailwind CSS 入口与自定义视觉样式。
+## 功能
 
-博客目前为一篇设计草稿及两篇明确标注的示例，未接入后台、评论或文章发布服务。项目卡片跳转真实仓库；卡片内界面为 CSS 设计示意。GitHub Profile 作为辅助仓库展示，待办安装包仓库作为 myToDoList 的补充入口。
+- 主页：个人介绍、项目展示与类型筛选、已发布博客阅读、深浅主题、滚动与悬浮动效、SVG 社交入口。
+- 概览：项目、已发布文章、草稿的真实数量与最近操作。
+- 项目管理：新建/编辑/删除、分类标签、排序、配色、GitHub 仓库和补充入口、草稿/发布。
+- 博客管理：新建/编辑/删除、正文段落、摘要、分类、日期、阅读时间、图标、草稿/发布。
+- 站点资料：昵称、所在地、个人介绍、B 站主页、页脚文字。
+
+后台保存立即持久化，公开主页下次加载读取最新已发布内容，不用重新构建。初始三篇原型文章为私有草稿；正文为纯文本，用 `## 标题` 分段，不执行 HTML。
+
+## 目录与命令
+
+| 目录 | 用途 |
+| --- | --- |
+| `web/` | 正式主页与后台前端 |
+| `server/` | 鉴权、内容接口、校验、SQLite、初始内容 |
+| `data/` | 本机私有数据库，已忽略，不进入 Git |
+| `tests/` | 鉴权与内容工作流测试 |
+| `deploy/` | 独立 Docker Compose、Nginx 配置 |
+| `docs/` | 实现、部署、验收说明与截图 |
+| `ui-design/` | 保留最初确认的设计原型 |
+
+```powershell
+npm test
+npm run format
+```
+
+`npm run build:design` 仅更新原始设计的单文件预览。正式主页和后台需要服务端，不能以双击 HTML 的方式运行。
+
+## 数据与部署
+
+数据库、环境配置和 SSH 私钥不进入 GitHub。详情见 [实现说明](docs/ARCHITECTURE.md)、[部署说明](docs/DEPLOYMENT.md) 与 [实际验收范围](docs/VALIDATION.md)。
+
+已完成本机实现与验证。远程部署需取得经核实的 SSH 访问并准备域名 HTTPS；提供配置不代表网站已上线。

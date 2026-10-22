@@ -1,0 +1,12 @@
+.git
+node_modules
+data
+.env
+.env.*
+ui-design
+design-dist
+dist
+docs/previews
+artifacts
+.local
+tests

@@ -3,17 +3,30 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=24.13.0"
+  },
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
-    "build": "vite build && node scripts/export-preview.mjs",
-    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort"
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "dev:server": "node --watch --env-file-if-exists=.env server/index.js",
+    "build": "vite build",
+    "build:design": "vite build --config vite.design.config.js && node scripts/export-preview.mjs",
+    "preview": "npm run build && npm start",
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "admin:init": "node --env-file-if-exists=.env scripts/init-admin.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.js",
+    "format": "prettier --write web server tests scripts vite.config.js vite.design.config.js package.json"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4.3.3",
     "vite": "^8.3.5"
   },
   "dependencies": {
+    "express": "^5.3.0",
+    "helmet": "^8.3.0",
     "lucide": "^1.61.0",
     "simple-icons": "^16.35.0"
   }

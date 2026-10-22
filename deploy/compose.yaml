@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    ports:
+      - "127.0.0.1:5180:5180"
+    environment:
+      NODE_ENV: production
+      APP_ORIGIN: https://zeze49024.com
+      DATA_DIR: /app/data
+    volumes:
+      - /srv/myblog/data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,noexec,nosuid
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
