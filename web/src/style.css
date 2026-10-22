@@ -1806,6 +1806,14 @@ a:focus-visible {
   border-style: dashed;
   background: transparent;
 }
+.social-button.afdian {
+  color: #946ce6;
+}
+.social-button.afdian:hover {
+  background: #946ce6;
+  color: #fff;
+  border-color: #946ce6;
+}
 .social-note {
   font-size: 8px;
   color: #9ba3b0;

@@ -37,7 +37,7 @@ import {
   Globe,
   SlidersHorizontal,
 } from "lucide";
-import { siBilibili, siGithub } from "simple-icons";
+import { siAfdian, siBilibili, siGithub } from "simple-icons";
 import { escapeHTML, escapeTree } from "./safe.js";
 let site;
 try {
@@ -61,7 +61,7 @@ const brand = (item) =>
   `<svg viewBox="0 0 24 24" role="img" aria-hidden="true" fill="currentColor"><path d="${item.path}"/></svg>`;
 const external = 'target="_blank" rel="noopener noreferrer"';
 const socialLinks = () =>
-  `<a class="social-button" href="${github}" ${external} aria-label="访问 zeze49024 的 GitHub 主页">${brand(siGithub)}</a><a class="social-button bilibili" href="${profile.bilibili || "https://space.bilibili.com/1378527004"}" ${external} aria-label="访问 zeze49024 的 B 站主页">${brand(siBilibili)}</a><button class="social-button more-social" type="button" aria-label="更多社交渠道" aria-describedby="social-note">${icon("plus")}</button>`;
+  `<a class="social-button" href="${github}" ${external} aria-label="访问 zeze49024 的 GitHub 主页">${brand(siGithub)}</a><a class="social-button bilibili" href="${profile.bilibili || "https://space.bilibili.com/1378527004"}" ${external} aria-label="访问 zeze49024 的 B 站主页">${brand(siBilibili)}</a><a class="social-button afdian" href="https://afdian.com/a/zeze49024" ${external} aria-label="在爱发电支持 zeze49024" title="爱发电 · 支持我的创作">${brand(siAfdian)}</a><button class="social-button more-social" type="button" aria-label="更多社交渠道" aria-describedby="social-note">${icon("plus")}</button>`;
 
 function visual(type) {
   if (type === "orvia")
