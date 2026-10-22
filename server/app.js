@@ -14,13 +14,17 @@ import {
 export function createApp({
   dataDir,
   origin,
+  adminOrigin = origin,
   production = false,
   distDir = resolve("dist"),
   now = Date.now,
 }) {
-  const expectedOrigin = new URL(origin).origin;
-  if (production && new URL(expectedOrigin).protocol !== "https:")
-    throw new Error("生产环境 APP_ORIGIN 必须使用 HTTPS");
+  const expectedOrigin = new URL(adminOrigin).origin;
+  if (
+    production &&
+    [origin, adminOrigin].some((value) => new URL(value).protocol !== "https:")
+  )
+    throw new Error("生产环境 APP_ORIGIN 和 ADMIN_ORIGIN 必须使用 HTTPS");
   const db = openStore(dataDir);
   const app = express();
   app.disable("x-powered-by");

@@ -1,4 +1,4 @@
-# 先配置 zeze49024.com 的域名解析与对应证书，再启用此站点。
+# 先配置主页、admin 子域名解析及各自证书，再启用此站点。
 # 单独创建本文件，不覆盖 default 或其他站点配置。
 server {
     listen 80;
@@ -19,6 +19,11 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     client_max_body_size 256k;
 
+    location ~ ^/admin(?:/|\.html)?$ {
+        return 301 https://admin.zeze49024.com/$is_args$args;
+    }
+    location ^~ /api/auth/ { return 404; }
+    location ^~ /api/admin/ { return 404; }
     location / {
         proxy_pass http://127.0.0.1:5180;
         proxy_set_header Host $host;
@@ -27,4 +32,33 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_read_timeout 30s;
     }
+}
+
+server {
+    listen 80;
+    server_name admin.zeze49024.com;
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/myblog-acme;
+        default_type text/plain;
+    }
+    location / { return 301 https://admin.zeze49024.com$request_uri; }
+}
+server {
+    listen 443 ssl;
+    server_name admin.zeze49024.com;
+    ssl_certificate /etc/letsencrypt/live/admin.zeze49024.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/admin.zeze49024.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    client_max_body_size 256k;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 30s;
+
+    location = / { proxy_pass http://127.0.0.1:5180/admin; }
+    location = /index.html { return 301 https://admin.zeze49024.com/; }
+    location ~ ^/admin(?:/|\.html)?$ { return 301 https://admin.zeze49024.com/$is_args$args; }
+    location / { proxy_pass http://127.0.0.1:5180; }
 }

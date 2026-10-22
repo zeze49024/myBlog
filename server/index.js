@@ -5,6 +5,10 @@ const host = process.env.HOST || "127.0.0.1";
 const { app, db } = createApp({
   dataDir: resolve(process.env.DATA_DIR || "data"),
   origin: process.env.APP_ORIGIN || `http://127.0.0.1:${port}`,
+  adminOrigin:
+    process.env.ADMIN_ORIGIN ||
+    process.env.APP_ORIGIN ||
+    `http://127.0.0.1:${port}`,
   production: process.env.NODE_ENV === "production",
 });
 const server = app.listen(port, host, () =>

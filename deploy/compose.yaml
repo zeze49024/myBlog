@@ -10,6 +10,7 @@ services:
     environment:
       NODE_ENV: production
       APP_ORIGIN: https://zeze49024.com
+      ADMIN_ORIGIN: https://admin.zeze49024.com
       DATA_DIR: /app/data
     volumes:
       - /srv/myblog/data:/app/data

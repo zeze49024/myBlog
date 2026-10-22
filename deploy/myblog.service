@@ -11,6 +11,7 @@ Environment=NODE_ENV=production
 Environment=HOST=127.0.0.1
 Environment=PORT=5180
 Environment=APP_ORIGIN=https://zeze49024.com
+Environment=ADMIN_ORIGIN=https://admin.zeze49024.com
 Environment=DATA_DIR=/srv/myblog/data
 ExecStart=/opt/myblog-node/current/bin/node /srv/myblog/current/server/index.js
 Restart=on-failure

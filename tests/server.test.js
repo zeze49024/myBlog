@@ -38,7 +38,7 @@ async function fixture(options = {}) {
       body,
       cookie,
       csrf,
-      requestOrigin = options.origin || origin,
+      requestOrigin = options.adminOrigin || options.origin || origin,
     } = {},
   ) => {
     const response = await fetch(base + path, {
@@ -380,6 +380,67 @@ test("stored content is escaped before rendering including nested article paragr
   const value = escapeTree({ body: [["<svg>", '"quoted" & text']] });
   assert.equal(value.body[0][0], "&lt;svg&gt;");
   assert.equal(value.body[0][1], "&quot;quoted&quot; &amp; text");
+});
+
+test("separate admin origin accepts owner login and rejects public-site writes", async () => {
+  assert.throws(
+    () =>
+      createApp({
+        dataDir: "unused",
+        origin: "https://zeze49024.com",
+        adminOrigin: "http://admin.zeze49024.com",
+        production: true,
+      }),
+    /HTTPS/,
+  );
+  await withFixture(
+    async (f) => {
+      const auth = await f.login();
+      assert.equal((await f.call("/api/admin/content", auth)).status, 200);
+      for (const requestOrigin of [
+        "https://zeze49024.com",
+        "https://evil.example",
+      ]) {
+        assert.equal(
+          (
+            await f.call("/api/auth/login", {
+              method: "POST",
+              requestOrigin,
+              body: { username: "zeze49024", password },
+            })
+          ).status,
+          403,
+        );
+        assert.equal(
+          (
+            await f.call("/api/auth/logout", {
+              method: "POST",
+              requestOrigin,
+              ...auth,
+              body: {},
+            })
+          ).status,
+          403,
+        );
+      }
+      assert.equal((await f.call("/api/auth/session", auth)).status, 200);
+      assert.equal(
+        (
+          await f.call("/api/auth/logout", {
+            method: "POST",
+            ...auth,
+            body: {},
+          })
+        ).status,
+        200,
+      );
+    },
+    {
+      origin: "https://zeze49024.com",
+      adminOrigin: "https://admin.zeze49024.com",
+      production: true,
+    },
+  );
 });
 test("private filesystem and unrecognized routes are not served", () =>
   withFixture(async (f) => {
