@@ -4,19 +4,21 @@
 
 ## 当前实际部署 · 2026-10-22
 
-**最终状态：服务器部署就绪，域名备案审核中，公网访问被阿里云阻断。** 最初公网 HTTPS 与后台功能检查曾通过，之后 HTTP 返回 `Non-compliance ICP Filing` 的 403 拦截页，HTTPS 连接也被重置。用户确认正在备案；保留服务与配置，等待备案完成后复验，不改变端口或绕过平台限制。
+**当前状态：服务器及独立后台子域名部署就绪，域名备案审核中，公网访问仍不稳定。** 后台子域名在实际浏览器中登录成功；独立网络检查仍出现 HTTPS 握手失败，HTTP 证书校验遇到 403。此前根域名也返回 `Non-compliance ICP Filing` 拦截页。用户确认正在备案；等待备案完成后复验，不改变端口或绕过平台限制。
 
-- 主页：<https://zeze49024.com/>；后台：<https://zeze49024.com/admin>。
+- 主页：<https://zeze49024.com/>；后台：<https://admin.zeze49024.com/>。主页域名的 `/admin`、`/admin/`、`/admin.html` 跳转至后台域名；主页域名不提供 `/api/auth/`、`/api/admin/` 管理接口。
 - 实际采用原生 Node.js **24.22.1 + systemd + Nginx 1.24**，未使用 Docker。下方 Docker 操作作为替代方案保留。
 - 官方 Linux x64 Node 发行包已核对官方 SHA-256：`6c172a9ab6718f7b801fb5a7bd486af2ee5e32758086a04b84fcce2aa77095e6`。
 - 应用运行时：`/opt/myblog-node/current/bin/node`。
-- 应用代码：`/srv/myblog/releases/df6b9e3ba0a5`；`/srv/myblog/current` 指向当前版本。
+- 应用代码：`/srv/myblog/releases/eb55ad7901ad`；`/srv/myblog/current` 指向当前版本。此次升级保留云端数据库，升级前的数据库和代理、服务配置备份在 `/srv/myblog/backups/admin-subdomain-20261022/`。
 - 独立无登录系统账号 `myblog` 运行应用，systemd 配置见 `deploy/myblog.service`；已启用开机启动。
 - 数据：`/srv/myblog/data/site.sqlite`，属主 myblog，目录 700、文件 600；端口 `5180` 仅监听回环地址。
 - 通过 SQLite 一致性备份迁移本机的 5 个项目、3 篇草稿、资料及站长密码哈希。迁移文件清除了会话与限流数据，未传输密码明文。迁移前的云端初始库保存在 `/srv/myblog/backups/pre-migration-20261022/`。
 - Nginx 独立配置：`/etc/nginx/sites-available/myblog`。HTTP 跳转 HTTPS，ACME 校验路径单独保留用于续期。
-- 阿里云 DNS 新增根域名 `@` A 记录 → `47.104.0.233`，TTL 600 秒；未修改其他域名。
+- 阿里云 DNS 配置 `@`、`admin` A 记录 → `47.104.0.233`，TTL 600 秒。后台证书的 DNS 验证记录为 `_acme-challenge.admin` TXT；该记录用于本次签发，不能复用于未来续期。
 - Let's Encrypt 证书位于 `/etc/letsencrypt/live/zeze49024.com/`，当前有效期至 2027-01-20；certbot.timer 和续期后 Nginx reload hook 已配置。
+- 后台独立证书位于 `/etc/letsencrypt/live/admin.zeze49024.com/`，有效期至 **2027-01-20**。HTTP 校验被备案拦截后，已通过手动 DNS-01 验证签发；**后台证书目前不能自动续期**。备案通过后执行 `sudo certbot reconfigure --cert-name admin.zeze49024.com --webroot -w /var/www/myblog-acme`，成功后再执行 `sudo certbot renew --dry-run --no-random-sleep-on-renew --cert-name admin.zeze49024.com` 验收，不能将尚未执行的切换视为已完成。若到期前备案尚未通过，需重新手动 DNS 验证续期。
+- 应用配置 `ADMIN_ORIGIN=https://admin.zeze49024.com`，写入和登录仅接受后台来源。会话为后台主机独享的 `__Host-` Cookie，不设置共享 Domain。后台“返回主页”链接指向主域名。
 - 续期模拟因阿里云备案阻断 ACME HTTP 校验返回 403 而失败。备案通过后运行 `sudo certbot renew --dry-run --no-random-sleep-on-renew --cert-name zeze49024.com` 重新验收。不能将“已配置自动续期”理解为当前续期校验已通过。
 - 生产环境没有明文初始密码配置；账号验证使用迁移到服务器的 scrypt 哈希。不要将生产数据库、证书私钥或会话信息上传 GitHub。
 
@@ -50,6 +52,7 @@ NODE_ENV=production
 HOST=127.0.0.1
 PORT=5180
 APP_ORIGIN=https://zeze49024.com
+ADMIN_ORIGIN=https://admin.zeze49024.com
 DATA_DIR=/srv/myblog/data
 ```
 

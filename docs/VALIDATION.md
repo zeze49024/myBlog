@@ -56,3 +56,13 @@
 - Let's Encrypt 续期模拟在 ACME HTTP 校验处遇到同一 403 阻断。已保留现有有效证书、续期定时器、webroot 校验路径和 Nginx reload hook，待备案通过后复验。
 - 服务器本机应用、Nginx、数据权限和开机自启配置仍正常，未通过其他端口、代理或其他域名绕过阻断。
 - `live-home.png` 和 `live-admin-login.png` 是拦截出现前的实际截图，不代表最终公网仍然畅通。
+
+## 独立后台子域名验收 · 2026-10-22
+
+- `admin.zeze49024.com` 公共 DNS 已返回 `47.104.0.233`，控制台 A 记录启用；DNS-01 验证签发有效 HTTPS 证书，有效期至 2027-01-20。手动 DNS 证书尚不能自动续期，后续处理见部署文档。
+- 本机 `npm test`：16 项全部通过，新增独立后台来源允许、主页/第三方来源拒绝、HTTP 后台来源生产配置拒绝测试。`npm run build` 和 `git diff --check` 通过。
+- 新版已实际安装至 `/srv/myblog/releases/eb55ad7901ad` 并切换 systemd 服务，保留原有云端数据；myblog、nginx active，Nginx 配置校验通过。
+- 从服务器回环接口执行真实 HTTPS 请求，正常校验证书和 SNI：后台根路径及所引用静态资源 200；旧入口跳转 301；主页域名管理接口 404；匿名管理内容 401；指定站长账号登录 200。
+- Cookie 含 `__Host-`、Secure、HttpOnly、SameSite=Strict，且无 Domain 属性；主域名来源登录 403，无 CSRF 退出 403，正常退出后旧会话 401。
+- 实际浏览器访问 `https://admin.zeze49024.com/` 并使用指定账号登录成功；概览展示 5 个项目、0 篇已发布文章和 3 篇草稿；主页链接指向 `https://zeze49024.com/`。
+- 同时独立网络 curl 检查 HTTPS 仍遭握手中断，证书 HTTP 验证曾返回 403。因此浏览器本次成功不等于所有网络稳定畅通，仍须等待备案通过后复验。没有开放额外公网端口或配置绕过限制的代理。
