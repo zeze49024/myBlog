@@ -1,6 +1,11 @@
 # zeze49024 · 个人网站
 
-个人介绍、公开项目展示与博客，以及仅站长可登录的内容管理后台。计划域名：`zeze49024.com`。
+个人介绍、公开项目展示与博客，以及仅站长可登录的内容管理后台。
+
+- 云端主页：<https://zeze49024.com/>
+- 云端后台：<https://zeze49024.com/admin>
+
+2026-10-22 已部署至独立 Ubuntu 云服务器。**域名正在备案，阿里云当前阻断公网 HTTP/HTTPS 访问，等待审核通过后复验。** 后续正式内容在云端后台维护；本机和云端数据库各自独立，不自动同步。
 
 前端使用 Vite、JavaScript、Tailwind CSS 4、Lucide 和 Simple Icons，沿用已确认的第一版 UI；后端使用 Node.js、Express 和 SQLite。
 
@@ -67,4 +72,4 @@ npm run format
 
 数据库、环境配置和 SSH 私钥不进入 GitHub。详情见 [实现说明](docs/ARCHITECTURE.md)、[部署说明](docs/DEPLOYMENT.md) 与 [实际验收范围](docs/VALIDATION.md)。
 
-已完成本机实现与验证。远程部署需取得经核实的 SSH 访问并准备域名 HTTPS；提供配置不代表网站已上线。
+本机实现与云服务器部署均已完成。公网首轮 HTTPS、登录、写入、退出和访问控制检查通过后，云平台因备案审核中阻断访问；最终公网验收需等待备案通过。运行记录和部署方式见上述说明。

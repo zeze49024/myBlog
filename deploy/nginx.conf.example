@@ -3,7 +3,13 @@
 server {
     listen 80;
     server_name zeze49024.com;
-    return 301 https://zeze49024.com$request_uri;
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/myblog-acme;
+        default_type text/plain;
+    }
+    location / {
+        return 301 https://zeze49024.com$request_uri;
+    }
 }
 server {
     listen 443 ssl;

@@ -1,0 +1,28 @@
+[Unit]
+Description=zeze49024 personal website
+After=network.target
+
+[Service]
+Type=simple
+User=myblog
+Group=myblog
+WorkingDirectory=/srv/myblog/current
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=5180
+Environment=APP_ORIGIN=https://zeze49024.com
+Environment=DATA_DIR=/srv/myblog/data
+ExecStart=/opt/myblog-node/current/bin/node /srv/myblog/current/server/index.js
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=20
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/myblog/data
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target
